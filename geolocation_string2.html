@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>場所の記録</title>
+    <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?key=Akz7IgnGKjyMjQzktE0iAJ054gqJ3iNtCqOxfi0RoRWNiKo5E2sttItzYsBNrhEf&callback=loadMapScenario" async defer></script>
+    <link rel="stylesheet" href="css/sample.css">
+  </head>
+<body>
+    <div id="myMap" style="position:relative;width:600px;height:400px;"></div>
+
+    <form onsubmit="searchLocation(); return false;">
+        <label for="locationInput">場所名:</label>
+        <input type="text" id="locationInput" required>
+        <button type="submit">検索</button>
+    </form>
+
+    <script>
+        let map;
+
+        function loadMapScenario() {
+            map = new Microsoft.Maps.Map('#myMap', {
+                center: new Microsoft.Maps.Location(0, 0),
+                zoom: 2
+            });
+        }
+
+        function searchLocation() {
+            const locationInput = document.getElementById('locationInput');
+            const locationName = locationInput.value;
+
+            Microsoft.Maps.loadModule('Microsoft.Maps.Search', function () {
+                const searchManager = new Microsoft.Maps.Search.SearchManager(map);
+                const geocodeRequestOptions = {
+                    where: locationName,
+                    callback: function (geocodeResult, userData) {
+                        if (geocodeResult && geocodeResult.results && geocodeResult.results.length > 0) {
+                            const location = geocodeResult.results[0].location;
+                            const pushpin = new Microsoft.Maps.Pushpin(location);
+                            map.entities.push(pushpin);
+                            map.setView({ center: location, zoom: 10 });
+                        }
+                    }
+                };
+                searchManager.geocode(geocodeRequestOptions);
+            });
+        }
+    </script>
+</body>
+</html>
